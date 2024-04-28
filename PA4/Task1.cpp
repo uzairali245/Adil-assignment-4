@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <map>
 #define RESET "\033[0m"
 #define RED "\033[31m"
 #define GREEN "\033[32m"
@@ -24,34 +23,36 @@ private:
     Node *head; // Pointer to the head of the linked list
 
 public:
-    map<int,int> priorities;
+    vector<int> existing;
     PDCLaneManager() : head(nullptr) {}
 
     // Function to insert a new node with given priority
     void insertNode(int priority)
     {
-        // Implement insertion logic here
-        if(priorities.find(priority) == priorities.end()){
-            priorities[priority]=priority;
-            // Create a new node
-            Node *newNode = new Node;
-            newNode->priority = priority;
-            newNode->next = nullptr; // New node will be the last node, so its next should be nullptr
+        // Check if the priority already exists in the list
+        if (find(existing.begin(), existing.end(), priority) != existing.end()) {
+            return; // Priority already exists, do not insert
+        }
 
-            // If the linked list is empty, make the new node the head
-            if (head == nullptr) {
-                head = newNode;
-            } else {
-                // Traverse the linked list to find the last node
-                Node *current = head;
-                while (current->next != nullptr) {
-                    current = current->next;
-                }
-                // Insert the new node after the last node
-                current->next = newNode;
+        // Priority doesn't exist, insert it
+        existing.push_back(priority);
+
+        // Create a new node
+        Node *newNode = new Node;
+        newNode->priority = priority;
+        newNode->next = nullptr;
+
+        // If the linked list is empty, make the new node the head
+        if (head == nullptr) {
+            head = newNode;
+        } else {
+            // Traverse the linked list to find the last node
+            Node *current = head;
+            while (current->next != nullptr) {
+                current = current->next;
             }
-        }else {
-            return;
+            // Insert the new node after the last node
+            current->next = newNode;
         }
     }
 
@@ -123,7 +124,7 @@ public:
             }
         }
 
-        // At this point, slow is pointing to the middle node
+        // slow is pointing to the middle node
         // Split the linked list at the middle node
         *leftRef = head;
         *rightRef = slow->next;
